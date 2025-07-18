@@ -1,0 +1,7 @@
+version: 2
+
+models:
+  - name: example_biglake_table
+    description: "External table using a BigQuery connection, allowing fine-grained access control with policy tags."
+  - name: example_external_table
+    description: "Standard external table for querying data in Google Cloud Storage without a BigQuery connection."

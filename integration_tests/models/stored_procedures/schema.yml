@@ -1,0 +1,7 @@
+version: 2
+
+models:
+  - name: example_procedure
+    description: "Stored procedure that runs a query."
+  - name: example_procedure_creator
+    description: "Stored procedure with a side effect to create a table."

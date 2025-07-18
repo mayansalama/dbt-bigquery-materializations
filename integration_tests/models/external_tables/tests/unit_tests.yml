@@ -1,0 +1,9 @@
+version: 2
+
+models:
+  - name: test_example_external_table
+    columns:
+      - name: name
+        tests:
+          - not_null
+      - name: post_abbr

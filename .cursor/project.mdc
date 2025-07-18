@@ -1,0 +1,79 @@
+# dbt-bigquery-materializations Project Context
+
+## 1. Project Overview
+
+This is a dbt package that provides custom materializations for Google BigQuery. It is not a standalone dbt project to be run directly, but rather a library of macros to be consumed by other dbt projects. The primary goal is to enable the creation and management of BigQuery-specific objects like external tables (including BigLake tables), stored procedures, and user-defined functions directly from dbt models.
+
+## 2. Core Components
+
+The core logic is located in the `macros/` directory.
+
+### Materializations
+
+These are the main objects provided by the package, implemented in `macros/materializations/`:
+-   **`external_table`**: Creates BigQuery external tables. Supports both standard GCS tables and BigLake tables (via a `connection_name` config) which enables features like policy tags.
+-   **`function`**: Creates BigQuery User-Defined Functions (UDFs). Supports SQL, JavaScript, and Python. For Python/JS, the model's SQL content is the body of the function.
+-   **`stored_procedure`**: Creates a BigQuery Stored Procedure. The model's SQL content becomes the body of the procedure.
+-   **`call_procedure`**: A simple materialization that executes a `CALL` statement. This is used to run a stored procedure as a distinct node in the dbt DAG, making operational tasks explicit and testable.
+-   **`table_function`**: Creates a BigQuery Table-Valued Function (TVF).
+
+### Helper Macros
+
+Located in `macros/helpers/`:
+-   **`parse_options.sql`**: A utility macro for parsing dictionary/YAML options into the `key=value` string format required by BigQuery's `OPTIONS()` clause.
+
+## 3. Project Structure
+
+```
+.
+├── .github/workflows/integration-tests.yml  # CI workflow for running tests
+├── .gitignore
+├── CONTRIBUTING.md                          # Guide for setting up a local dev environment
+├── README.md                                # User-facing documentation (auto-generated)
+├── dbt_project.yml                          # Defines this project as a dbt package
+├── integration_tests/                       # A self-contained dbt project for testing the materializations
+│   ├── dbt_project.yml
+│   ├── models/
+│   │   ├── call_procedures/
+│   │   ├── external_tables/
+│   │   ├── scalar_functions/
+│   │   ├── stored_procedures/
+│   │   └── table_functions/
+│   ├── profiles.yml                         # dbt profiles for local and CI runs
+│   └── seeds/                               # CSV seed files for tests
+├── macros/                                  # Core logic of the package
+│   ├── materializations/
+│   └── schema.yml                           # Source of truth for macro documentation
+└── scripts/
+    ├── create_policy_tag.py                 # Idempotent script to create GCP resources for tests
+    ├── generate_docs.py                     # Script to generate README.md from schema.yml
+    └── project-setup.sh                     # Local development setup script
+```
+
+## 4. Key Workflows
+
+### Local Development & Testing
+-   **Setup**: The primary guide is `CONTRIBUTING.md`. It involves setting up a Python virtual environment (e.g., with `uv`), installing dependencies, and running the `./scripts/project-setup.sh` script to create necessary GCP resources (Service Account, GCS Bucket, BigLake Connection, etc.).
+-   **Running Tests**: Tests are executed by navigating to the `integration_tests/` directory, exporting secrets from the generated `.secrets` file, and running `dbt build`.
+
+### CI/CD
+-   The workflow is defined in `.github/workflows/integration-tests.yml`.
+-   It uses a matrix strategy to test against multiple versions of `dbt-bigquery`.
+-   It expects several repository secrets (e.g., `GCP_PROJECT_ID`, `GCP_TEST_SERVICE_ACCOUNT`) to be configured for a pre-existing GCP project where test resources can be created.
+-   It dynamically creates a unique BigQuery dataset for each job in the matrix to prevent race conditions.
+
+### Documentation
+-   The user-facing `README.md` is **auto-generated**.
+-   The source of truth for macro documentation is `macros/schema.yml`.
+-   The source of truth for the **examples** in the README are the `schema.yml` files located within each subdirectory of `integration_tests/models/` (e.g., `integration_tests/models/stored_procedures/schema.yml`).
+-   To update the documentation, edit the relevant `schema.yml` file(s) and then run `python scripts/generate_docs.py` from the project root.
+
+## 5. Naming Conventions & Patterns
+
+-   **Test Models**: All models inside `integration_tests/models/` are for testing purposes. They are prefixed with `example_` (e.g., `example_procedure.sql`).
+-   **Test Structure**: Tests for models are located in a `tests/` subdirectory within the corresponding model type's folder. For example, tests for `stored_procedures` are in `integration_tests/models/stored_procedures/tests/`.
+-   **Materialization Usage**: Models specify which materialization to use via the `config()` block. For example: `{{ config(materialized='stored_procedure') }}`.
+description:
+globs:
+alwaysApply: false
+---

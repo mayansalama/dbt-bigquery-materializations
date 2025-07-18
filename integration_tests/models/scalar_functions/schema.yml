@@ -1,0 +1,13 @@
+version: 2
+
+models:
+  - name: example_js_add_one
+    description: "Simple JavaScript UDF that adds one to an integer."
+  - name: example_js_library
+    description: "JavaScript UDF that uses an external library from Google Cloud Storage."
+  - name: example_python_add_one
+    description: "Simple Python UDF that adds one to an integer."
+  - name: example_python_library
+    description: "Python UDF that uses an external library from PyPI."
+  - name: example_sql_add_one
+    description: "Simple SQL UDF that adds one to an integer." 

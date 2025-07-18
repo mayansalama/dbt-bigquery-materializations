@@ -1,0 +1,31 @@
+# Environments
+.env
+.venv
+env/
+venv/
+
+# dbt
+dbt_packages/
+logs/
+target/
+
+# Secrets
+.secrets
+local-gcloud-creds.json
+
+# IDEs / Editors
+.vscode/
+.idea/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+build/
+dist/
+*.egg-info/
+
+# macOS
+.DS_Store 

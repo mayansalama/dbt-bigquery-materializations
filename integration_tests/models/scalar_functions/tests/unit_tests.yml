@@ -1,0 +1,25 @@
+version: 2
+
+models:
+  - name: test_example_sql_add_one
+    tests:
+      - dbt_utils.equality:
+          compare_model: ref('expected_example_sql_add_one')
+  - name: test_example_js_add_one
+    tests:
+      - dbt_utils.equality:
+          compare_model: ref('expected_example_sql_add_one')
+  - name: test_example_python_add_one
+    tests:
+      - dbt_utils.equality:
+          compare_model: ref('expected_example_sql_add_one')
+  - name: test_example_js_library
+    columns:
+      - name: company_name
+        tests:
+          - not_null
+  - name: test_example_python_library
+    columns:
+      - name: address
+        tests:
+          - not_null

@@ -1,0 +1,7 @@
+version: 2
+
+models:
+  - name: example_table_function
+    description: "Simple table-valued function that returns a table."
+  - name: example_table_function_string_args
+    description: "Table-valued function that accepts string arguments." 

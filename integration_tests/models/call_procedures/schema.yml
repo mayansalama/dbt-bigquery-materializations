@@ -1,0 +1,5 @@
+version: 2
+models:
+  - name: call_example_procedure_creator
+    description: "Calls a stored procedure using the `call_procedure` materialization."
+

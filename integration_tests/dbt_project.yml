@@ -1,0 +1,27 @@
+name: 'dbt_bigquery_materializations_tests'
+version: '1.0.0'
+config-version: 2
+
+profile: dbt_bigquery_materializations_tests
+
+model-paths: ["models"]
+
+flags:
+    send_anonymous_usage_stats: False
+    use_colors: True
+
+clean-targets:
+  - target
+  - dbt_packages
+
+models:
+  +start: Jan 1 2017  
+  +persist_docs:
+    relation: true
+    columns: true
+
+vars:
+  dbt_bigquery_materializations:
+    get_query_comment:
+      dbt_bigquery_monitoring_version: "0.0.1"
+

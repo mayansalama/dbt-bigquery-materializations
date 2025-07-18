@@ -1,0 +1,31 @@
+version: 2
+
+macros:
+  - name: parse_options
+    description: "Parses a dictionary or a YAML string of options and formats them as a comma-separated string of `key=value` pairs. This is a helper macro used by other materializations to handle the `OPTIONS` clause in BigQuery DDL statements."
+    arguments:
+      - name: options
+        type: "dict or string"
+        description: "A dictionary or a YAML string containing the options to be parsed."
+  - name: external_table
+    description: "A materialization for creating external tables in BigQuery. It supports both standard external tables and BigLake tables by allowing the specification of a `connection`."
+    tags: ['materialization']
+  - name: function
+    description: "A materialization for creating scalar user-defined functions (UDFs) in BigQuery. It supports SQL, JavaScript, and Python functions."
+    tags: ['materialization']
+  - name: stored_procedure
+    description: "A materialization for creating stored procedures in BigQuery. This allows you to encapsulate complex logic, including DDL and DML statements, into a reusable and version-controlled dbt model."
+    tags: ['materialization']
+    arguments:
+      - name: arguments
+        type: "list"
+        description: "A list of arguments for the procedure. Each argument should be a dictionary with `name` and `type` keys."
+      - name: options
+        type: "dict"
+        description: "A dictionary of options for the procedure, such as `strict_mode`."
+  - name: call_procedure
+    description: "A materialization for executing a stored procedure as a node in the dbt DAG. This is the recommended way to run procedures that perform actions (like DML or DDL) rather than using hooks. It makes dependencies explicit and keeps your DAG clean."
+    tags: ['materialization']
+  - name: table_function
+    description: "A materialization for creating table-valued functions (TVFs) in BigQuery. It currently only supports SQL."
+    tags: ['materialization'] 
