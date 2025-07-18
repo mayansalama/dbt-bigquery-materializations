@@ -26,7 +26,7 @@ Located in `macros/helpers/`:
 
 ```
 .
-├── .github/workflows/integration-tests.yml  # CI workflow for running tests
+├── .github/workflows/pr_run_tests.yml  # CI workflow for running tests
 ├── .gitignore
 ├── CONTRIBUTING.md                          # Guide for setting up a local dev environment
 ├── README.md                                # User-facing documentation (auto-generated)
@@ -57,7 +57,7 @@ Located in `macros/helpers/`:
 -   **Running Tests**: Tests are executed by navigating to the `integration_tests/` directory, exporting secrets from the generated `.secrets` file, and running `dbt build`.
 
 ### CI/CD
--   The workflow is defined in `.github/workflows/integration-tests.yml`.
+-   The workflow is defined in `.github/workflows/pr_run_tests.yml`.
 -   It uses a matrix strategy to test against multiple versions of `dbt-bigquery`.
 -   It expects several repository secrets (e.g., `GCP_PROJECT_ID`, `GCP_TEST_SERVICE_ACCOUNT`) to be configured for a pre-existing GCP project where test resources can be created.
 -   It dynamically creates a unique BigQuery dataset for each job in the matrix to prevent race conditions.
