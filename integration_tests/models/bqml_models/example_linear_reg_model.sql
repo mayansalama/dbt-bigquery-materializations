@@ -1,6 +1,6 @@
 {{
     config(
-        materialized='model',
+        materialized='bqml_model',
         options={
             'model_type': 'LINEAR_REG',
             'input_label_cols': ['label']

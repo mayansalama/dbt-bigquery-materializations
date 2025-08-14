@@ -48,7 +48,7 @@ def generate_docs():
 
         macros = schema.get('macros', [])
         # Known materialization macro names (including export_data)
-        known_mat_names = set(['export_data', 'external_table', 'function', 'table_function', 'stored_procedure', 'call_procedure', 'model'])
+        known_mat_names = set(['export_data', 'external_table', 'function', 'table_function', 'stored_procedure', 'call_procedure', 'bqml_model'])
 
         # Materializations by name present in schema
         mat_by_name = {m.get('name'): m for m in macros if m.get('name') in known_mat_names}

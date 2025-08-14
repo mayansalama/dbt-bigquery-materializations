@@ -4,6 +4,15 @@ This package provides materializations for creating and managing BigQuery-specif
 
 ## Materializations
 
+### `bqml_model`
+
+Materialization for BigQuery ML CREATE MODEL. Configure OPTIONS (for example, model_type) and provide an AS SELECT training query.
+
+#### Example
+
+- [`example_linear_reg_model.sql`](integration_tests/models/bqml_models/example_linear_reg_model.sql): A simple linear regression model to predict a label based on a single feature.
+- [`example_arima_plus_model.sql`](integration_tests/models/bqml_models/example_arima_plus_model.sql): An ARIMA-based time-series forecasting model.
+
 ### `call_procedure`
 
 Executes CALL <procedure>(…) as a dbt node. Configure the target routine and arguments. Useful for procedures that perform DDL/DML or side effects.
@@ -43,15 +52,6 @@ Materialization for CREATE FUNCTION (scalar UDF). Supports SQL, JavaScript, and 
 - [`example_js_library.sql`](integration_tests/models/scalar_functions/example_js_library.sql): JavaScript UDF that uses an external library from Google Cloud Storage.
 - [`example_python_add_one.sql`](integration_tests/models/scalar_functions/example_python_add_one.sql): Simple Python UDF that adds one to an integer.
 - [`example_python_library.sql`](integration_tests/models/scalar_functions/example_python_library.sql): Python UDF that uses an external library from PyPI.
-
-### `model`
-
-Materialization for BigQuery ML CREATE MODEL. Configure OPTIONS (for example, model_type) and provide an AS SELECT training query.
-
-#### Example
-
-- [`example_linear_reg_model.sql`](integration_tests/models/bqml_models/example_linear_reg_model.sql): A simple linear regression model to predict a label based on a single feature.
-- [`example_arima_plus_model.sql`](integration_tests/models/bqml_models/example_arima_plus_model.sql): An ARIMA-based time-series forecasting model.
 
 ### `stored_procedure`
 

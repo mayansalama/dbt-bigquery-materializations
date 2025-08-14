@@ -2,6 +2,37 @@
 
 This guide provides instructions for setting up a local development environment to contribute to this project.
 
+## Contributing Process
+
+1. Fork the repository to your GitHub account
+2. Clone your fork locally:
+   ```bash
+   git clone https://github.com/YOUR-USERNAME/dbt-bigquery-materializations.git
+   cd dbt-bigquery-materializations
+   ```
+3. Add the upstream repository as a remote:
+   ```bash
+   git remote add upstream https://github.com/ORIGINAL-OWNER/dbt-bigquery-materializations.git
+   ```
+4. Create a new branch for your changes:
+   ```bash
+   git checkout -b feature/your-feature-name
+   ```
+5. Make your changes and commit them with clear, descriptive commit messages
+6. Push to your fork:
+   ```bash
+   git push origin feature/your-feature-name
+   ```
+7. Open a Pull Request from your fork to the main repository
+8. Ensure all checks pass and address any review comments
+
+Remember to keep your fork up to date:
+```bash
+git fetch upstream
+git checkout main
+git merge upstream/main
+```
+
 ## Local Development Setup
 
 ### Prerequisites

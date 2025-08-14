@@ -1,4 +1,4 @@
-{% materialization model, adapter='bigquery' %}
+{% materialization bqml_model, adapter='bigquery' %}
   {%- set identifier = model['alias'] -%}
 
   {%- set old_relation = adapter.get_relation(identifier=identifier,

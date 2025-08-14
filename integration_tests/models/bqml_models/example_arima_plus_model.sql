@@ -1,6 +1,6 @@
 {{
     config(
-        materialized='model',
+        materialized='bqml_model',
         options={
             'model_type': 'ARIMA_PLUS',
             'time_series_timestamp_col': 'date_col',

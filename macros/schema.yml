@@ -55,7 +55,7 @@ macros:
       - title: Table-Valued Function with String Arguments
         path: integration_tests/models/table_functions/example_table_function_string_args.sql
         description: Table-valued function that accepts string arguments.
-  - name: model
+  - name: bqml_model
     description: Materialization for BigQuery ML CREATE MODEL. Configure OPTIONS (for example, model_type) and provide an AS SELECT training query.
     examples:
       - title: Linear Regression Model
