@@ -7,3 +7,8 @@ models:
         tests:
           - not_null
       - name: post_abbr
+  - name: test_example_biglake_table
+    columns:
+      - name: name
+        tests:
+          - not_null

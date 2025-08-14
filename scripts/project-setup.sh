@@ -66,13 +66,6 @@ if [ ! -f "$KEY_FILE" ]; then
         --role="roles/datacatalog.admin" \
         --condition=None > /dev/null # Suppress verbose output
 
-    # Grant Data Catalog Viewer role for reading taxonomies
-    echo "Ensuring Data Catalog Viewer role..."
-    gcloud projects add-iam-policy-binding "$GCP_PROJECT_ID" \
-        --member="serviceAccount:$SERVICE_ACCOUNT_EMAIL" \
-        --role="roles/datacatalog.viewer" \
-        --condition=None > /dev/null # Suppress verbose output
-
     # Grant Service Account User role to allow the service account to act as itself
     echo "Ensuring Service Account User role..."
     gcloud iam service-accounts add-iam-policy-binding "$SERVICE_ACCOUNT_EMAIL" \
@@ -89,6 +82,13 @@ if [ ! -f "$KEY_FILE" ]; then
 else
     echo "Key file '$KEY_FILE' already exists. Skipping service account setup."
 fi
+
+# Always ensure the dbt service account can read Data Catalog taxonomies in this project
+echo "Ensuring Data Catalog Viewer role for dbt service account on project ${GCP_PROJECT_ID}..."
+gcloud projects add-iam-policy-binding "$GCP_PROJECT_ID" \
+    --member="serviceAccount:$SERVICE_ACCOUNT_EMAIL" \
+    --role="roles/datacatalog.viewer" \
+    --condition=None > /dev/null # Suppress verbose output
 
 # --- Create BigQuery Connection and Grant Permissions ---
 # This must be done BEFORE activating the service account, as it requires project-level permissions
@@ -114,6 +114,13 @@ if [[ -z "$CONNECTION_SA" ]]; then
     exit 1
 fi
 echo "Connection Service Account: ${CONNECTION_SA}"
+
+# Grant Data Catalog Viewer role to the connection's service account so it can read taxonomies referenced by policy tags
+echo "Granting Data Catalog Viewer role to the connection's service account on the project..."
+gcloud projects add-iam-policy-binding "$GCP_PROJECT_ID" \
+    --member="serviceAccount:$CONNECTION_SA" \
+    --role="roles/datacatalog.viewer" \
+    --condition=None > /dev/null # Suppress verbose output
 
 # Grant Storage Object Viewer role to the connection's service account to allow it to read from GCS
 echo "Granting Storage Object Viewer role to the connection's service account on the specific GCS bucket..."
@@ -155,9 +162,13 @@ rm "$CUSTOM_JS_LIB_NAME"
 echo "Uploading seed file to GCS..."
 gcloud storage cp "integration_tests/seeds/example_external_table_data.csv" "gs://${GCP_TEST_BUCKET_NAME}/example_external_table_data.csv"
 
-# Create a policy tag for testing
-echo "Creating policy tag taxonomy and policy tag..."
-DBT_POLICY_TAG=$(python scripts/create_policy_tag.py | tail -n 1)
+# Create or use an existing policy tag for testing
+if [[ -n "$DBT_POLICY_TAG" ]]; then
+  echo "Using existing DBT_POLICY_TAG from environment: ${DBT_POLICY_TAG}"
+else
+  echo "Creating policy tag taxonomy and policy tag..."
+  DBT_POLICY_TAG=$(python scripts/create_policy_tag.py | tail -n 1)
+fi
 
 # Validate that we received a valid-looking policy tag resource name
 if ! [[ "$DBT_POLICY_TAG" =~ ^projects/.*/locations/.*/taxonomies/.*/policyTags/.*$ ]]; then
@@ -167,6 +178,17 @@ if ! [[ "$DBT_POLICY_TAG" =~ ^projects/.*/locations/.*/taxonomies/.*/policyTags/
     exit 1
 fi
 echo "Policy Tag created successfully: ${DBT_POLICY_TAG}"
+
+# Ensure dbt service account has Data Catalog Viewer on the taxonomy project (handles cross-project taxonomies)
+# Extract the project after 'projects/' (field 2)
+PT_PROJECT=$(echo "$DBT_POLICY_TAG" | cut -d'/' -f2)
+if [[ "$PT_PROJECT" != "$GCP_PROJECT_ID" ]]; then
+    echo "Granting Data Catalog Viewer role to ${SERVICE_ACCOUNT_EMAIL} on taxonomy project: ${PT_PROJECT}"
+    gcloud projects add-iam-policy-binding "$PT_PROJECT" \
+        --member="serviceAccount:$SERVICE_ACCOUNT_EMAIL" \
+        --role="roles/datacatalog.viewer" \
+        --condition=None > /dev/null
+fi
 
 # --- Create secrets file for local `act` runs ---
 echo ""

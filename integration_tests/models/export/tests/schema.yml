@@ -1,0 +1,27 @@
+version: 2
+
+models:
+  - name: external_table_on_export_output
+    tests:
+      - row_count_equals:
+          name: test_no_schedule_row_count
+          value: 1  # Incremental vs full refersh each export 1 row with different URIs
+
+  - name: external_table_on_scheduled_export_output
+    tests:
+      - row_count_equals:
+          name: test_with_schedule_row_count
+          value: 1  # First export generates 1 row, incremental test looks for same row
+
+  - name: actual_dbt_export_audit_summary
+    tests:
+      # This test is tagged to be skipped on the full-refresh pass.
+      - incremental_equality:
+          name: test_incremental_audit_summary_equality
+          compare_model: ref('expected_incremental_audit_summary')
+
+  - name: external_table_on_export_csv_output
+    tests:
+      - row_count_equals:
+          name: test_csv_row_count
+          value: 1

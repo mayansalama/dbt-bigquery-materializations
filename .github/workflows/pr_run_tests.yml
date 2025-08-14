@@ -13,7 +13,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        dbt_version: ['1.8', '1.9', '1.10']
+        dbt_version: ['1.9', '1.10']
 
     steps:
       - name: Checkout repository
@@ -49,7 +49,9 @@ jobs:
           DBT_POLICY_TAG: ${{ secrets.DBT_POLICY_TAG }}
           DBT_BIGQUERY_CONNECTION: ${{ secrets.DBT_BIGQUERY_CONNECTION }}
           GCP_TEST_BUCKET_NAME: ${{ secrets.GCP_TEST_BUCKET_NAME }}
+          DBT_BQ_MATERIALIZATIONS_TEST_ID: ${{ github.sha }}_${{ matrix.dbt_version }}
         run: |
           source .venv${{ matrix.dbt_version }}/bin/activate
           dbt deps
-          dbt build --target ci
+          dbt build --full-refresh --target ci 
+          dbt build --target ci 

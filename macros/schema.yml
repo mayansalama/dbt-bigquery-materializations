@@ -1,31 +1,84 @@
 version: 2
 
 macros:
-  - name: parse_options
-    description: "Parses a dictionary or a YAML string of options and formats them as a comma-separated string of `key=value` pairs. This is a helper macro used by other materializations to handle the `OPTIONS` clause in BigQuery DDL statements."
-    arguments:
-      - name: options
-        type: "dict or string"
-        description: "A dictionary or a YAML string containing the options to be parsed."
   - name: external_table
-    description: "A materialization for creating external tables in BigQuery. It supports both standard external tables and BigLake tables by allowing the specification of a `connection`."
-    tags: ['materialization']
+    description: Materialization for BigQuery CREATE EXTERNAL TABLE (including BigLake). Configure table OPTIONS (for example, uris, format, schema, connection). BigLake tables require a BigQuery connection resource.
+    examples:
+      - title: Standard External Table
+        path: integration_tests/models/external_tables/example_external_table.sql
+        description: Standard external table for querying data in Google Cloud Storage without a BigQuery connection.
+      - title: BigLake Table
+        path: integration_tests/models/external_tables/example_biglake_table.sql
+        description: External table using a BigQuery connection, allowing fine-grained access control with policy tags.
   - name: function
-    description: "A materialization for creating scalar user-defined functions (UDFs) in BigQuery. It supports SQL, JavaScript, and Python functions."
-    tags: ['materialization']
+    description: Materialization for CREATE FUNCTION (scalar UDF). Supports SQL, JavaScript, and Python. Configure language/body and function OPTIONS; the SELECT defines returned value(s).
+    examples:
+      - title: SQL UDF
+        path: integration_tests/models/scalar_functions/example_sql_add_one.sql
+        description: Simple SQL UDF that adds one to an integer.
+      - title: JavaScript UDF
+        path: integration_tests/models/scalar_functions/example_js_add_one.sql
+        description: Simple JavaScript UDF that adds one to an integer.
+      - title: JavaScript UDF with GCS Library
+        path: integration_tests/models/scalar_functions/example_js_library.sql
+        description: JavaScript UDF that uses an external library from Google Cloud Storage.
+      - title: Python UDF
+        path: integration_tests/models/scalar_functions/example_python_add_one.sql
+        description: Simple Python UDF that adds one to an integer.
+      - title: Python UDF with PyPI Library
+        path: integration_tests/models/scalar_functions/example_python_library.sql
+        description: Python UDF that uses an external library from PyPI.
   - name: stored_procedure
-    description: "A materialization for creating stored procedures in BigQuery. This allows you to encapsulate complex logic, including DDL and DML statements, into a reusable and version-controlled dbt model."
-    tags: ['materialization']
-    arguments:
-      - name: arguments
-        type: "list"
-        description: "A list of arguments for the procedure. Each argument should be a dictionary with `name` and `type` keys."
-      - name: options
-        type: "dict"
-        description: "A dictionary of options for the procedure, such as `strict_mode`."
+    description: Materialization for CREATE PROCEDURE. Configure the routine signature (arguments) and a GoogleSQL body (multi‑statement supported). No special dependencies.
+    examples:
+      - title: Simple Stored Procedure
+        path: integration_tests/models/stored_procedures/example_procedure.sql
+        description: Stored procedure that runs a query.
+      - title: Stored Procedure with Side Effect
+        path: integration_tests/models/stored_procedures/example_procedure_creator.sql
+        description: Stored procedure with a side effect to create a table.
   - name: call_procedure
-    description: "A materialization for executing a stored procedure as a node in the dbt DAG. This is the recommended way to run procedures that perform actions (like DML or DDL) rather than using hooks. It makes dependencies explicit and keeps your DAG clean."
-    tags: ['materialization']
+    description: Executes CALL <procedure>(…) as a dbt node. Configure the target routine and arguments. Useful for procedures that perform DDL/DML or side effects.
+    examples:
+      - title: Simple Stored Procedure
+        path: integration_tests/models/stored_procedures/example_procedure.sql
+        description: Stored procedure that runs a query.
+      - title: Stored Procedure with Side Effect
+        path: integration_tests/models/stored_procedures/example_procedure_creator.sql
+        description: Stored procedure with a side effect to create a table.
   - name: table_function
-    description: "A materialization for creating table-valued functions (TVFs) in BigQuery. It currently only supports SQL."
-    tags: ['materialization'] 
+    description: Materialization for CREATE TABLE FUNCTION (TVF). SQL only. Configure arguments and the RETURNS TABLE query that defines the output schema and rows.
+    examples:
+      - title: Simple Table-Valued Function
+        path: integration_tests/models/table_functions/example_table_function.sql
+        description: Simple table-valued function that returns a table.
+      - title: Table-Valued Function with String Arguments
+        path: integration_tests/models/table_functions/example_table_function_string_args.sql
+        description: Table-valued function that accepts string arguments.
+  - name: model
+    description: Materialization for BigQuery ML CREATE MODEL. Configure OPTIONS (for example, model_type) and provide an AS SELECT training query.
+    examples:
+      - title: Linear Regression Model
+        path: integration_tests/models/bqml_models/example_linear_reg_model.sql
+        description: A simple linear regression model to predict a label based on a single feature.
+      - title: ARIMA Time-Series Model
+        path: integration_tests/models/bqml_models/example_arima_plus_model.sql
+        description: An ARIMA-based time-series forecasting model.
+  - name: export_data
+    description: Runs the BigQuery EXPORT DATA statement via the `sp_export_data` stored procedure. Configure uri, format, options_string, is_incremental, timestamp_column, and export_schedule. Depends on `dbt_export_audit` and var `DBT_BQ_MATERIALIZATIONS_ENABLE_EXPORT`.
+    examples:
+      - title: Incremental Export (no schedule)
+        path: integration_tests/models/export/example_export_job.sql
+        description: Exports a model incrementally to PARQUET.
+      - title: Incremental Export (with schedule)
+        path: integration_tests/models/export/example_export_job_with_schedule.sql
+        description: Exports incrementally but skips if it already ran in the same day.
+      - title: Full CSV Export with Options
+        path: integration_tests/models/export/example_csv_full_export.sql
+        description: Full export to CSV with header and custom delimiter.
+  - name: parse_options
+    description: Helper macro to render key=value pairs for BigQuery OPTIONS clauses from a mapping or YAML string. Validates reserved keywords when provided.
+    arguments:
+      - name: options
+        type: dict or string
+        description: A dictionary or a YAML string containing the options to be parsed. 

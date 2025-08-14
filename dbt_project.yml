@@ -13,6 +13,7 @@ config-version: 2
 # The `model-paths` config, for example, states that models in this project can be
 # found in the "models/" directory. You probably won't need to change these!
 macro-paths: ["macros"]
+test-paths: ["tests"]
 
 # Telling dbt how to dispatch package macros
 dispatch:
@@ -23,3 +24,16 @@ dispatch:
 clean-targets: # directories to be removed by `dbt clean`
   - "target"
   - "dbt_packages"
+
+# dbt project configuration
+vars:
+  # this variable controls whether the export-related models and procedures are enabled
+  DBT_BQ_MATERIALIZATIONS_ENABLE_EXPORT_PROCS: false
+  # for the dbt_export_audit table, this variable controls the full_refresh behavior
+  # in production this should be false, but can be set to true for testing
+  DBT_BQ_MATERIALIZATIONS_AUDIT_FULL_REFRESH: false
+
+models:
+  dbt_bigquery_materializations:
+    export:
+      # TODO: allow dynamic config of dataset and table names

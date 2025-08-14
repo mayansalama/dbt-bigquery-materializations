@@ -1,0 +1,16 @@
+version: 2
+
+models:
+  - name: test_prediction
+    columns:
+      - name: predicted_label
+        tests:
+          - not_null
+  - name: test_forecast
+    columns:
+      - name: forecast_timestamp
+        tests:
+          - not_null
+      - name: forecast_value
+        tests:
+          - not_null 

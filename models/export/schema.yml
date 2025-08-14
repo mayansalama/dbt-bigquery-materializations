@@ -1,0 +1,61 @@
+version: 2
+
+models:
+  - name: dbt_export_audit
+    description: "A log table that tracks the status and metadata of dbt-driven data exports."
+    columns:
+      - name: dbt_export_run_id
+      - name: model_relation
+        description: "The unique identifier for the dbt model performing the export."
+      - name: bigquery_job_id
+        description: "Custom job ID for the `EXPORT DATA` statement."
+      - name: uri
+        description: "The Google Cloud Storage URI used for the export."
+      - name: query_string
+        description: "The fully rendered EXPORT DATA SQL statement executed for the export."
+      - name: export_row_count
+        description: "Number of rows selected by the export query (from the same snapshot) prior to executing EXPORT DATA."
+      - name: export_started_at
+        description: "Timestamp when the export stored procedure began execution."
+      - name: export_completed_at
+        description: "Timestamp when the `EXPORT DATA` statement finished."
+      - name: data_interval_start
+        description: "The start of the data time window for the export (exclusive)."
+      - name: data_interval_end
+        description: "The end of the data time window for the export (inclusive)."
+      - name: status
+        description: "The status of the export (`started`, `success`, `skipped`, or `fail`)."
+      - name: failure_reason
+        description: "Error message captured when an export fails (if available)."
+
+  - name: sp_export_data
+    description: |
+      A stored procedure that handles stateful, incremental exports of data from a source table to an external location like GCS.
+
+      #### Arguments
+
+      - `source_query` (string): The SQL query that defines the data to be exported.
+      - `model_relation_str` (string): The string representation of the dbt model relation (`{{ this }}`), used for logging in the audit table.
+      - `uri` (string): The Google Cloud Storage URI where the exported files will be written.
+      - `export_format` (string): The format of the exported files (e.g., `PARQUET`, `CSV`).
+      - `export_options` (array<struct<name string, value string>>): An array of key-value pairs for export options (e.g., `field_delimiter`).
+      - `is_incremental` (bool): A boolean flag indicating whether the export should be incremental.
+      - `timestamp_column` (string): The name of the timestamp column used for incremental exports.
+      - `export_schedule` (string): A date-part granularity to limit repeated exports within the same period. Accepted values: `minute`, `hour`, `day`.
+      - `invocation_id` (string): The dbt invocation id for this run; used to construct a stable custom job id for audit updates.
+
+      #### Configuration
+
+      ##### `DBT_BQ_MATERIALIZATIONS_AUDIT_FULL_REFRESH`
+
+      - **Type**: `boolean`
+      - **Default**: `false`
+
+      This variable controls the materialization behavior of the `dbt_export_audit` table. When set to `true`, the audit table will be completely rebuilt on every run. This is useful for testing environments where a clean slate is desired for each test run. In production, this should be left as `false` to maintain a persistent audit log.
+
+      ##### `DBT_BQ_MATERIALIZATIONS_ENABLE_EXPORT_PROCS`
+
+      - **Type**: `boolean`
+      - **Default**: `false`
+
+      This variable controls whether the export-related models and procedures (`dbt_export_audit` and `sp_export_data`) are enabled. To use the export functionality, set this variable to `true` in your `dbt_project.yml`. 

@@ -52,7 +52,7 @@ Before you can run the integration tests locally for the first time, you need to
     - Create a `.secrets` file in the project root containing the service account key, project ID, and the newly created policy tag for `act` to use.
 
     ```bash
-    ./scripts/project-setup.sh
+    sh /scripts/project-setup.sh
     ```
     The script is idempotent. If the service account and key file already exist, it will skip those creation steps.
 
@@ -72,6 +72,9 @@ You can also run dbt commands directly against your BigQuery project. This is us
 3.  **Run dbt**:
     You can now run any dbt command, for example:
     ```bash
+    # Initial setup and test
+    dbt build --full-refresh
+    # Incremental test
     dbt build
     ```
 
