@@ -1,0 +1,7 @@
+dbt_export_run_id,model_relation,bigquery_job_id,uri,export_started_at,export_completed_at,data_interval_start,data_interval_end,status,export_row_count
+STATIC,example_export_job_with_schedule,STATIC_JOB,STATIC_URI,1970-01-01 00:00:00 UTC,1970-01-01 00:00:00 UTC,,1970-01-01 00:00:00 UTC,success,1
+STATIC,example_export_job_with_schedule,STATIC_JOB,STATIC_URI,1970-01-01 00:00:00 UTC,1970-01-01 00:00:00 UTC,,,skipped,
+STATIC,example_export_job,STATIC_JOB,STATIC_URI,1970-01-01 00:00:00 UTC,1970-01-01 00:00:00 UTC,,1970-01-01 00:00:00 UTC,success,1
+STATIC,example_export_job,STATIC_JOB,STATIC_URI,1970-01-01 00:00:00 UTC,1970-01-01 00:00:00 UTC,1970-01-01 00:00:00 UTC,1970-01-01 00:00:00 UTC,success,1
+STATIC,example_csv_full_export,STATIC_JOB,STATIC_URI,1970-01-01 00:00:00 UTC,1970-01-01 00:00:00 UTC,,,success,1
+STATIC,example_csv_full_export,STATIC_JOB,STATIC_URI,1970-01-01 00:00:00 UTC,1970-01-01 00:00:00 UTC,,,success,1

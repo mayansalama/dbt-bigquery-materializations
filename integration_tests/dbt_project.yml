@@ -14,14 +14,12 @@ clean-targets:
   - target
   - dbt_packages
 
+vars:
+  DBT_BQ_MATERIALIZATIONS_AUDIT_FULL_REFRESH: true
+  DBT_BQ_MATERIALIZATIONS_ENABLE_EXPORT: true
+
 models:
   +start: Jan 1 2017  
   +persist_docs:
     relation: true
     columns: true
-
-vars:
-  dbt_bigquery_materializations:
-    get_query_comment:
-      dbt_bigquery_monitoring_version: "0.0.1"
-
