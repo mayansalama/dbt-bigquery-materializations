@@ -14,6 +14,15 @@
   {%- set partition_by = config.get('partition_by') -%}
   {%- set connection = config.get('connection') -%}
 
+  {%- set existing = adapter.get_relation(
+      identifier=target_relation.identifier,
+      schema=target_relation.schema,
+      database=target_relation.database) -%}
+
+  {%- if existing and replace -%}
+    {% do adapter.drop_relation(existing) %}
+  {%- endif -%}
+
   {%- set replace_clause = 'CREATE OR REPLACE' if replace else 'CREATE' -%}
 
   {{ run_hooks(pre_hooks) }}

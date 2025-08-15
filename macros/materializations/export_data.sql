@@ -13,7 +13,7 @@
   {%- set export_schedule = config.get('export_schedule') -%}
   {%- set invocation_id_cfg = config.get('invocation_id', invocation_id) -%}
   {%- set model_relation_str = config.get('model_relation_str', this) -%}
-2
+
   {%- if uri is none or uri == '' -%}
     {%- do exceptions.raise_compiler_error('export_data: config "uri" is required') -%}
   {%- endif -%}
@@ -23,6 +23,8 @@
   {%- if is_incremental and (timestamp_column is none or timestamp_column == '') -%}
     {%- set is_incremental = false -%}
   {%- endif -%}
+
+  {{ run_hooks(pre_hooks) }}
 
   {%- set reserved = ['uri', 'format', 'overwrite'] -%}
   {%- set options_string = dbt_bigquery_materializations.parse_options(export_options, reserved) -%}
@@ -43,6 +45,8 @@
   {%- call statement('main') -%}
     {{ call_sql }}
   {%- endcall -%}
+
+  {{ run_hooks(post_hooks) }}
 
   {{ return({'relations': []}) }}
 {% endmaterialization %} 

@@ -1,30 +1,19 @@
 {% materialization bqml_model, adapter='bigquery' %}
   {%- set identifier = model['alias'] -%}
 
-  {%- set old_relation = adapter.get_relation(identifier=identifier,
-                                              schema=schema,
-                                              database=database) -%}
   {%- set target_relation = api.Relation.create(identifier=identifier,
-                                                 schema=schema,
-                                                 database=database,
-                                                 type='table') -%}
+                                               schema=schema,
+                                               database=database,
+                                               type='table') -%}
 
-  {{ run_hooks(pre_hooks, inside_transaction=False) }}
-
-  -- `BEGIN` happens here:
-  {{ run_hooks(pre_hooks, inside_transaction=True) }}
+  {{ run_hooks(pre_hooks) }}
 
   -- build model
   {%- call statement('main') -%}
     {{ dbt_bigquery_materializations.bigquery__create_model_as(target_relation, sql) }}
   {%- endcall -%}
 
-  {{ run_hooks(post_hooks, inside_transaction=True) }}
-
-  -- `COMMIT` happens here
-  {{ adapter.commit() }}
-
-  {{ run_hooks(post_hooks, inside_transaction=False) }}
+  {{ run_hooks(post_hooks) }}
 
   {{ return({'relations': [target_relation]}) }}
 {% endmaterialization %}
