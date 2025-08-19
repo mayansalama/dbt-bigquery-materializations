@@ -12,7 +12,7 @@ This guide provides instructions for setting up a local development environment 
    ```
 3. Add the upstream repository as a remote:
    ```bash
-   git remote add upstream https://github.com/ORIGINAL-OWNER/dbt-bigquery-materializations.git
+   git remote add upstream https://github.com/mayansalama/dbt-bigquery-materializations.git
    ```
 4. Create a new branch for your changes:
    ```bash
@@ -42,6 +42,7 @@ git merge upstream/main
     - [BigQuery API](https://console.cloud.google.com/apis/library/bigquery.googleapis.com)
     - [Cloud Storage API](https://console.cloud.google.com/apis/library/storage.googleapis.com)
     - [Data Catalog API](https://console.cloud.google.com/apis/library/datacatalog.googleapis.com)
+        (Need to change to dataplex)
     - [BigQuery Connection API](https://console.cloud.google.com/apis/library/bigqueryconnection.googleapis.com)
 3.  **Python**: Make sure you have `python`, `pip` (and for this guide `uv`)
 4.  **Docker**: Docker Desktop must be installed and running.
@@ -67,12 +68,16 @@ For a faster setup experience, you can use `uv` to create and manage your virtua
 
 Before you can run the integration tests locally for the first time, you need to set up the necessary GCP resources. A bash script is provided to automate this.
 
-1.  **Set your GCP Project ID**:
+1.  **Set your GCP Details**:
     ```bash
     export GCP_PROJECT_ID="your-gcp-project-id"
+    export GCP_REGION="australia-southeast1"  # Defaults to EU if not set
     ```
-
-2.  **Run the setup script**:
+2.  **Log in to GCP**:
+    ```bash
+    gcloud auth login
+    ```
+3.  **Run the setup script**:
     This script will:
     - Create a dedicated GCP Service Account (`dbt-materializations-ci`).
     - Assign it the necessary `BigQuery Admin`, `Storage Admin`, and `Data Catalog Admin` roles.
@@ -83,7 +88,7 @@ Before you can run the integration tests locally for the first time, you need to
     - Create a `.secrets` file in the project root containing the service account key, project ID, and the newly created policy tag for `act` to use.
 
     ```bash
-    sh /scripts/project-setup.sh
+    sh scripts/project-setup.sh
     ```
     The script is idempotent. If the service account and key file already exist, it will skip those creation steps.
 
