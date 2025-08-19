@@ -109,6 +109,7 @@ You can also run dbt commands directly against your BigQuery project. This is us
     You can now run any dbt command, for example:
     ```bash
     # Initial setup and test
+    dbt deps
     dbt build --full-refresh
     # Incremental test
     dbt build
