@@ -41,6 +41,7 @@ if [ ! -f "$KEY_FILE" ]; then
             --project="$GCP_PROJECT_ID" \
             --description="Service account for dbt-bigquery-materializations CI" \
             --display-name="DBT Materializations CI"
+        sleep 10 # Seems to be an issue with immediately recognising it after creation
     else
         echo "Service account already exists."
     fi
@@ -122,14 +123,6 @@ gcloud projects add-iam-policy-binding "$GCP_PROJECT_ID" \
     --role="roles/datacatalog.viewer" \
     --condition=None > /dev/null # Suppress verbose output
 
-# Grant Storage Object Viewer role to the connection's service account to allow it to read from GCS
-echo "Granting Storage Object Viewer role to the connection's service account on the specific GCS bucket..."
-gcloud storage buckets add-iam-policy-binding "gs://${GCP_TEST_BUCKET_NAME}" \
-    --member="serviceAccount:$CONNECTION_SA" \
-    --role="roles/storage.objectViewer"
-
-DBT_BIGQUERY_CONNECTION="projects/${GCP_PROJECT_ID}/locations/${GCP_REGION}/connections/${CONNECTION_ID}"
-
 # --- GCS Bucket and Test Files ---
 echo ""
 echo "--- Setting up GCS Bucket and Test Files ---"
@@ -142,6 +135,14 @@ if ! gcloud storage buckets describe "gs://${GCP_TEST_BUCKET_NAME}" > /dev/null 
 else
     echo "GCS bucket gs://${GCP_TEST_BUCKET_NAME} already exists."
 fi
+
+# Grant Storage Object Viewer role to the connection's service account to allow it to read from GCS
+echo "Granting Storage Object Viewer role to the connection's service account on the specific GCS bucket..."
+gcloud storage buckets add-iam-policy-binding "gs://${GCP_TEST_BUCKET_NAME}" \
+    --member="serviceAccount:$CONNECTION_SA" \
+    --role="roles/storage.objectViewer"
+
+DBT_BIGQUERY_CONNECTION="projects/${GCP_PROJECT_ID}/locations/${GCP_REGION}/connections/${CONNECTION_ID}"
 
 # --- Create and Upload Custom JS Library ---
 echo "Creating custom JS library: ${CUSTOM_JS_LIB_NAME}"
@@ -167,7 +168,7 @@ if [[ -n "$DBT_POLICY_TAG" ]]; then
   echo "Using existing DBT_POLICY_TAG from environment: ${DBT_POLICY_TAG}"
 else
   echo "Creating policy tag taxonomy and policy tag..."
-  DBT_POLICY_TAG=$(python scripts/create_policy_tag.py | tail -n 1)
+  DBT_POLICY_TAG=$(python scripts/create_policy_tag.py "${KEY_FILE}" | tail -n 1)
 fi
 
 # Validate that we received a valid-looking policy tag resource name

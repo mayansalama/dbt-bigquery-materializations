@@ -1,8 +1,9 @@
 import os
+import sys
 from google.cloud import datacatalog_v1
 from google.api_core import exceptions
 
-def create_or_get_policy_tag():
+def create_or_get_policy_tag(cred_file):
     """
     Finds or creates a specific taxonomy and policy tag for testing.
 
@@ -24,7 +25,7 @@ def create_or_get_policy_tag():
     policy_tag_display_name = "pii_test_tag"
     parent = f"projects/{project_id}/locations/{location}"
 
-    client = datacatalog_v1.PolicyTagManagerClient()
+    client = datacatalog_v1.PolicyTagManagerClient.from_service_account_file(filename=cred_file)
 
     # 1. Find or create the taxonomy
     taxonomy_name = ""
@@ -80,4 +81,4 @@ def create_or_get_policy_tag():
     print(policy_tag_name)
 
 if __name__ == "__main__":
-    create_or_get_policy_tag() 
+    create_or_get_policy_tag(sys.argv[1])

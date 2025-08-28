@@ -5,7 +5,7 @@
     materialized='export_data',
     uri='gs://' ~ env_var('GCP_TEST_BUCKET_NAME') ~ '/' ~ this.name ~ '/' ~ env_var('DBT_BQ_MATERIALIZATIONS_TEST_ID', 'abc') ~ '/*.parquet',
     export_format='PARQUET',
-    timestamp_column='updated_at_converted',
+    timestamp_column='updated_at',
     export_schedule='day'
   )
 }}

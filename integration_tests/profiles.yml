@@ -3,10 +3,11 @@ dbt_bigquery_materializations_tests:
   outputs:
     local:
       type: bigquery
-      method: oauth
+      method: service-account
       project: "{{ env_var('GCP_PROJECT_ID') }}"
       dataset: "{{ env_var('BIGQUERY_DATASET', 'dbt_materializations_tests_local') }}"
       location: "{{ env_var('GCP_REGION', 'EU') }}"
+      keyfile: ../local-gcloud-creds.json
       threads: 8
     ci:
       type: bigquery
