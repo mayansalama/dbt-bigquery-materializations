@@ -13,16 +13,7 @@
   {%- endif -%}
   {%- set partition_by = config.get('partition_by') -%}
   {%- set connection = config.get('connection') -%}
-
-  {%- set existing = adapter.get_relation(
-      identifier=target_relation.identifier,
-      schema=target_relation.schema,
-      database=target_relation.database) -%}
-
-  {%- if existing and replace -%}
-    {% do adapter.drop_relation(existing) %}
-  {%- endif -%}
-
+  {# What's the reason for deleting first? #}
   {%- set replace_clause = 'CREATE OR REPLACE' if replace else 'CREATE' -%}
 
   {{ run_hooks(pre_hooks) }}
@@ -58,6 +49,7 @@
 
   {%- set has_policy_tags = model.columns | map(attribute='policy_tags') | select() | list | length > 0 -%}
   {%- if has_policy_tags and not connection -%}
+    {# would be better to check this before creating the external table at all I think #}
     {{ exceptions.raise_compiler_error(
         "Policy tags are only supported for BigLake tables. Please configure a `connection` for this model."
     ) }}
